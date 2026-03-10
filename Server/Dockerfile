@@ -1,6 +1,4 @@
-# 注释
-
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
@@ -10,4 +8,4 @@ ENV KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xms512m", "-Xmx2g", "-jar", "app.jar"]
