@@ -1,0 +1,37 @@
+# .github/workflows/deploy.yml
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build
+        run: mvn clean package -DskipTests
+
+      - name: Docker Build & Push
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} \
+            -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/chatflow-server:${{ github.sha }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/chatflow-server:${{ github.sha }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          kubectl --kubeconfig=kubeconfig.yaml set image \
+            deployment/chatflow-server \
+            chatflow-server=${{ secrets.DOCKER_USERNAME }}/chatflow-server:${{ github.sha }}
+          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment/chatflow-server
+  
