@@ -18,6 +18,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build
+        working-directory: ./Server
         run: mvn clean package -DskipTests
 
       - name: Docker Build & Push
@@ -34,4 +35,3 @@ jobs:
             deployment/chatflow-server \
             chatflow-server=${{ secrets.DOCKER_USERNAME }}/chatflow-server:${{ github.sha }}
           kubectl --kubeconfig=kubeconfig.yaml rollout status deployment/chatflow-server
-  
