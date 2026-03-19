@@ -33,7 +33,7 @@ jobs:
           host: ${{ secrets.SERVER_EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.SERVER_EC2_SSH_KEY }}
-          source: "./Server/target/chatflow-server-1.0-SNAPSHOT.jar"
+          source: "./Server/target/Server-1.0-SNAPSHOT.jar"
           target: "/home/ec2-user/chatflow/"
           strip_components: 1
 
@@ -53,7 +53,7 @@ jobs:
             # 启动应用
             cd /home/ec2-user/chatflow
             export KAFKA_BOOTSTRAP_SERVERS=13.220.177.87:9092
-            nohup java -jar chatflow-server-1.0-SNAPSHOT.jar \
+            nohup java -jar Server-1.0-SNAPSHOT.jar \
               --server.port=8080 \
               > app.log 2>&1 &
             
