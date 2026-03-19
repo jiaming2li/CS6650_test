@@ -46,18 +46,9 @@ jobs:
           command_timeout: 10m
           debug: true
           script: |
-            # 停止旧进程（如果还在运行）
-            pkill -f "java.*chatflow-server" || true
-            
-            # 创建目录
             mkdir -p /home/ec2-user/chatflow
-            
-            # 启动应用
             cd /home/ec2-user/chatflow
             export KAFKA_BOOTSTRAP_SERVERS=13.220.177.87:9092
-            nohup java -jar Server-1.0-SNAPSHOT.jar \
-              --server.port=8080 \
-              > app.log 2>&1 &
-            
+            nohup java -jar Server-1.0-SNAPSHOT.jar --server.port=8080 > app.log 2>&1 &
             echo "Server started"
 
