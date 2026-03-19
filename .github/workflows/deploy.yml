@@ -11,9 +11,10 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
+      - name: Set Node.js version
+        run: echo "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
 
       - name: Set up JDK 17
