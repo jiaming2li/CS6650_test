@@ -44,7 +44,7 @@ public class ChatLoadTestClient {
     private static final int SERVER_PORT = 8080;
     //private static final String SERVER_URL = "ws://" + SERVER_HOST + ":" + SERVER_PORT + "/chat/room/";
     //private static final String SERVER_URL = "ws://CS6650a2alb-1305823827.us-east-1.elb.amazonaws.com/chat/room/";
-    private static final String SERVER_URL = "ws://34.207.219.240:8080/chat/room/";
+    private static final String SERVER_URL = "ws://54.242.238.45:8080/chat/room/";
 
     // Message queues
     private final BlockingQueue<ChatMessage> warmupQueue = new LinkedBlockingQueue<>(32000);

@@ -1,5 +1,5 @@
 # .github/workflows/deploy.yml
-name: CI/CD
+name: CI/CD to EC2 (No Docker)
 
 on:
   push:
@@ -17,26 +17,31 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build
+      - name: Build Server JAR
         working-directory: ./Server
         run: mvn clean package -DskipTests
 
-      - name: Docker Login
-        uses: docker/login-action@v3
+      - name: Deploy to Server EC2
+        uses: appleboy/ssh-action@v0.1.0
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Docker Build & Push
-        working-directory: ./Server
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/chatflow-server:${{ github.sha }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/chatflow-server:${{ github.sha }}
-
-      - name: Deploy to Kubernetes
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
-          kubectl --kubeconfig=kubeconfig.yaml set image \
-            deployment/chatflow-server \
-            chatflow-server=${{ secrets.DOCKER_USERNAME }}/chatflow-server:${{ github.sha }}
-          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment/chatflow-server
+          host: ${{ secrets.SERVER_EC2_HOST }}
+          username: ${{ secrets.SERVER_EC2_USER }}
+          key: ${{ secrets.SERVER_EC2_SSH_KEY }}
+          script: |
+            # 创建目录
+            mkdir -p /home/${{ secrets.SERVER_EC2_USER }}/chatflow
+            
+            # 停止旧进程（如果还在运行）
+            pkill -f "java.*chatflow-server" || true
+            
+            # 复制新 jar 包
+            scp -o StrictHostKeyChecking=no ./Server/target/chatflow-server-1.0-SNAPSHOT.jar ${{ secrets.SERVER_EC2_USER }}@${{ secrets.SERVER_EC2_HOST }}:/home/${{ secrets.SERVER_EC2_USER }}/chatflow/
+            
+            # 启动应用
+            cd /home/${{ secrets.SERVER_EC2_USER }}/chatflow
+            export KAFKA_BOOTSTRAP_SERVERS=13.220.177.87:9092
+            nohup java -jar chatflow-server-1.0-SNAPSHOT.jar \
+              --server.port=8080 \
+              > app.log 2>&1 &
+            
+            echo "Server started"
