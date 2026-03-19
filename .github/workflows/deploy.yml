@@ -43,6 +43,8 @@ jobs:
           host: ${{ secrets.SERVER_EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.SERVER_EC2_SSH_KEY }}
+          command_timeout: 10m
+          debug: true
           script: |
             # 停止旧进程（如果还在运行）
             pkill -f "java.*chatflow-server" || true
