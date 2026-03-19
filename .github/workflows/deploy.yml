@@ -35,16 +35,16 @@ jobs:
           key: ${{ secrets.SERVER_EC2_SSH_KEY }}
           script: |
             # 创建目录
-            mkdir -p /home/ubuntu/chatflow
+            mkdir -p /home/ec2-user/chatflow
             
             # 停止旧进程（如果还在运行）
             pkill -f "java.*chatflow-server" || true
             
             # 复制新 jar 包
-            scp -o StrictHostKeyChecking=no ./Server/target/chatflow-server-1.0-SNAPSHOT.jar ubuntu@${{ secrets.SERVER_EC2_HOST }}:/home/ubuntu/chatflow/
+            scp -o StrictHostKeyChecking=no ./Server/target/chatflow-server-1.0-SNAPSHOT.jar ec2-user@${{ secrets.SERVER_EC2_HOST }}:/home/ec2-user/chatflow/
             
             # 启动应用
-            cd /home/ubuntu/chatflow
+            cd /home/ec2-user/chatflow
             export KAFKA_BOOTSTRAP_SERVERS=13.220.177.87:9092
             nohup java -jar chatflow-server-1.0-SNAPSHOT.jar \
               --server.port=8080 \
