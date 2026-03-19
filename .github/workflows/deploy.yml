@@ -45,7 +45,6 @@ jobs:
             
             # 启动应用
             cd /home/ubuntu/chatflow
-            export KAFKA_BOOTSTRAP_SERVERS=13.220.177.87:9092
             nohup java -jar chatflow-server-1.0-SNAPSHOT.jar \
               --server.port=8080 \
               > app.log 2>&1 &
