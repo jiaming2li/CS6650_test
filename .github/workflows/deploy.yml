@@ -27,6 +27,16 @@ jobs:
         working-directory: ./Server
         run: mvn clean package -DskipTests
 
+      - name: Copy JAR to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SERVER_EC2_SSH_KEY }}
+          source: "./Server/target/chatflow-server-1.0-SNAPSHOT.jar"
+          target: "/home/ec2-user/chatflow/"
+          strip_components: 1
+
       - name: Deploy to Server EC2
         uses: appleboy/ssh-action@master
         with:
@@ -34,14 +44,11 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SERVER_EC2_SSH_KEY }}
           script: |
-            # 创建目录
-            mkdir -p /home/ec2-user/chatflow
-            
             # 停止旧进程（如果还在运行）
             pkill -f "java.*chatflow-server" || true
             
-            # 复制新 jar 包
-            scp -o StrictHostKeyChecking=no ./Server/target/chatflow-server-1.0-SNAPSHOT.jar ec2-user@${{ secrets.SERVER_EC2_HOST }}:/home/ec2-user/chatflow/
+            # 创建目录
+            mkdir -p /home/ec2-user/chatflow
             
             # 启动应用
             cd /home/ec2-user/chatflow
@@ -51,3 +58,4 @@ jobs:
               > app.log 2>&1 &
             
             echo "Server started"
+
