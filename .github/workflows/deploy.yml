@@ -35,7 +35,7 @@ jobs:
           key: ${{ secrets.SERVER_EC2_SSH_KEY }}
           source: "./Server/target/Server-1.0-SNAPSHOT.jar"
           target: "/home/ec2-user/chatflow/"
-          strip_components: 1
+          strip_components: 2
 
       - name: Deploy to Server EC2
         uses: appleboy/ssh-action@master
